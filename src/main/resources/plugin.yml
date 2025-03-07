@@ -1,0 +1,10 @@
+name: TradeCenter
+version: '1.0.0'
+main: me.spaff.tradecenter.Main
+api-version: '1.21'
+authors: [ spaff ]
+commands:
+  tradecenter:
+    description: All commands for TradeCenter
+    permission: tc.command.execute
+    aliases: [ tc ]
