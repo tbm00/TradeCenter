@@ -1,6 +1,7 @@
 package me.spaff.tradecenter.listener;
 
 import me.spaff.tradecenter.Constants;
+import me.spaff.tradecenter.Main;
 import me.spaff.tradecenter.nms.PacketReader;
 import me.spaff.tradecenter.tradecenter.TradeCenter;
 import me.spaff.tradecenter.utils.*;
@@ -11,10 +12,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class PlayerListener implements Listener {
     @EventHandler
@@ -22,6 +25,17 @@ public class PlayerListener implements Listener {
         PacketReader.injectPlayer(e.getPlayer());
         TradeCenter.clearPlayerData(e.getPlayer());
         RecipesUtils.discoverRecipes(e.getPlayer());
+
+        // Update trade center item
+        for (int slot = 0; slot < e.getPlayer().getInventory().getContents().length; slot++) {
+            ItemStack item = e.getPlayer().getInventory().getItem(slot);
+            if (ItemUtils.isNull(item)) continue;
+            if (!TradeCenter.isTradeCenterItem(item)) continue;
+
+            ItemStack updatedItem = TradeCenter.getTradeCenterItem();
+            updatedItem.setAmount(item.getAmount());
+            e.getPlayer().getInventory().setItem(slot, updatedItem);
+        }
     }
 
     @EventHandler
@@ -90,5 +104,37 @@ public class PlayerListener implements Listener {
 
             new TradeCenter(block.getLocation()).open(player);
         }
+    }
+
+    @EventHandler
+    public void onPlayerItemHeldEvent(PlayerItemHeldEvent e) {
+        Player player = e.getPlayer();
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                int newSlot = e.getNewSlot();
+                ItemStack newSlotItem = player.getInventory().getItem(newSlot);
+
+                // Update trade center item
+                if (!ItemUtils.isNull(newSlotItem) && TradeCenter.isTradeCenterItem(newSlotItem)) {
+                    ItemStack updatedItem = TradeCenter.getTradeCenterItem();
+                    updatedItem.setAmount(newSlotItem.getAmount());
+
+                    player.getInventory().setItem(newSlot, updatedItem);
+                }
+            }
+        }.runTaskLater(Main.getInstance(), 5);
+    }
+
+    @EventHandler
+    public void onEntityPickupItemEvent(EntityPickupItemEvent e) {
+        if (!(e.getEntity() instanceof Player)) return;
+        if (!TradeCenter.isTradeCenterItem(e.getItem().getItemStack())) return;
+
+        // Update trade center item
+        ItemStack updatedItem = TradeCenter.getTradeCenterItem();
+        updatedItem.setAmount(e.getItem().getItemStack().getAmount());
+        e.getItem().setItemStack(updatedItem);
     }
 }
