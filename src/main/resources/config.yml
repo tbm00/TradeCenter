@@ -5,6 +5,7 @@ trade-center:
     lore: "&7Right-click when placed to view nearby villagers' trades."
   message:
     execute-cmd-no-permission: "&cYou don't have permission to execute this command!"
+    use-no-permission: "&cYou don't have permission to use this!"
     already-in-use: "&cThis trade center is currently being used by another player!"
     no-villagers-nearby: "&cThere are no nearby villagers!"
     invalid-trade: "&cThis trade no longer exists!"

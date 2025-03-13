@@ -2,6 +2,7 @@ package me.spaff.tradecenter.listener;
 
 import me.spaff.tradecenter.Constants;
 import me.spaff.tradecenter.Main;
+import me.spaff.tradecenter.config.Config;
 import me.spaff.tradecenter.nms.PacketReader;
 import me.spaff.tradecenter.tradecenter.TradeCenter;
 import me.spaff.tradecenter.utils.*;
@@ -99,6 +100,12 @@ public class PlayerListener implements Listener {
         if (!e.getHand().equals(EquipmentSlot.HAND)) return;
 
         if (TradeCenter.isTradeCenter(block)) {
+            if (!e.getPlayer().hasPermission(Constants.USE_PERMISSION)) {
+                e.setCancelled(true);
+                BukkitUtils.sendMessage(e.getPlayer(), Config.readString("trade-center.message.use-no-permission"));
+                return;
+            }
+
             if (e.isBlockInHand() && player.isSneaking()) return;
             e.setCancelled(true);
 

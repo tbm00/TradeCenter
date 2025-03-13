@@ -16,6 +16,23 @@ public class Config {
         File cfg = new File(Main.getInstance().getDataFolder(), "config.yml");
         if (!cfg.exists())
             Main.getInstance().saveResource("config.yml", false);
+        else {
+            FileManager fileManager = new FileManager("config");
+
+            HashMap<String, Object> checkMissing = new HashMap<>();
+            checkMissing.put("trade-center.message.use-no-permission", "&cYou don't have permission to use this!");
+
+            for (var missing : checkMissing.entrySet()) {
+                String path = missing.getKey();
+                Object defaultValue = missing.getValue();
+                if (fileManager.read(path) != null) continue;
+
+                fileManager.write(path, defaultValue);
+            }
+
+            fileManager.save();
+        }
+
         reload();
     }
 
@@ -23,8 +40,6 @@ public class Config {
         FileManager fileManager = new FileManager("config");
         processSection("", fileManager.getConfiguration(), configData);
     }
-
-    //
 
     public static HashMap<String, Object> getRawData() {
         return configData;

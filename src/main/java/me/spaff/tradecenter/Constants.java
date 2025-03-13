@@ -3,6 +3,10 @@ package me.spaff.tradecenter;
 import org.bukkit.Material;
 
 public class Constants {
+    // Permissions
+    public static final String COMMAND_PERMISSION = "tc.command.execute";
+    public static final String USE_PERMISSION = "tc.use.allow";
+
     // Trade Center
     public static final String TRADE_CENTER_DATA_ID = "TradeCenter";
 

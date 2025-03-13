@@ -1,5 +1,6 @@
 package me.spaff.tradecenter.cmd;
 
+import me.spaff.tradecenter.Constants;
 import me.spaff.tradecenter.Main;
 import me.spaff.tradecenter.config.Config;
 import me.spaff.tradecenter.tradecenter.TradeCenter;
@@ -40,7 +41,7 @@ public class TCCommands implements CommandExecutor {
             return false;
         }
 
-        if (!player.hasPermission("tc.command.execute")) {
+        if (!player.hasPermission(Constants.COMMAND_PERMISSION)) {
             BukkitUtils.sendMessage(player, Config.readString("trade-center.message.execute-cmd-no-permission"));
             return false;
         }
