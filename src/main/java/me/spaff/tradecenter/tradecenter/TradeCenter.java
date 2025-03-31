@@ -75,9 +75,7 @@ public class TradeCenter {
         }
 
         // Clear previous player trade data
-        Optional<PlayerTradeCenterData> playerTradeData = getPlayerData(player);
-        playerTradeData.ifPresent(data -> data.clearTradeData());
-        playerTradeData.orElseGet(() -> new PlayerTradeCenterData(location));
+        getPlayerData(player).ifPresent(data -> data.clearTradeData());
 
         // Store trade index and a villager, so we can validate them and
         // get which villager selected trade is from.
@@ -147,10 +145,10 @@ public class TradeCenter {
         playerData.put(player.getUniqueId(), new PlayerTradeCenterData(location));
 
         // Set player trade data
-        playerTradeData.ifPresent(playerData -> playerData.setTradeData(tradeData));
+        getPlayerData(player).ifPresent(playerData -> playerData.setTradeData(tradeData));
 
         // Set villagers' trading player to this player
-        playerTradeData.ifPresent(playerData -> {
+        getPlayerData(player).ifPresent(playerData -> {
             playerData.getTradeData().forEach((td) -> {
                 td.villager().setTradingPlayer(Packets.getCraftPlayer(player).getHandle());
             });
@@ -190,10 +188,14 @@ public class TradeCenter {
         // experience orbs after a trade
         Location tradeCenterLoc = TradeCenter.getPlayerData(player).orElseThrow().getTradeLocation();
 
+        System.out.println("player data: " + TradeCenter.getPlayerData(player).orElseThrow().getTradeData());
+
         boolean breakOut = false;
         int tradesAmount = 0;
         for (VillagerTradeData data : TradeCenter.getPlayerData(player).orElseThrow().getTradeData()) {
             Villager villager = data.villager();
+
+            System.out.println("player data");
 
             // Check if villager is valid
             Entity villagerEntity = Packets.getServerLevel(tradeCenterLoc.getWorld()).getEntity(villager.getId());
@@ -233,6 +235,8 @@ public class TradeCenter {
                             // and we get the amount of trades player has done
                             // this has to be done since there is no event for player trading
                             int tradedAmount = player.getStatistic(Statistic.TRADED_WITH_VILLAGER) - playerTradeCount;
+
+                            System.out.println("player traded with villager ");
 
                             // Iterate the traded amount and update uses, villager xp etc
                             for (int j = 0; j < tradedAmount; j++) {

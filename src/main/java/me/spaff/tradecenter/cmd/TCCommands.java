@@ -50,7 +50,7 @@ public class TCCommands implements CommandExecutor {
         //---------------- Commands ----------------//
 
         if (args[0].equalsIgnoreCase("give")) {
-            if (args.length < 3) {
+            if (args.length == 2) {
                 Player otherPlayer = Bukkit.getPlayer(args[1]);
                 if (otherPlayer == null) {
                     sendPluginMessage(player, "&cInvalid player!");
