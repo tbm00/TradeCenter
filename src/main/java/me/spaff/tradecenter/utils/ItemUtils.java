@@ -25,7 +25,7 @@ import java.util.*;
 
 public class ItemUtils {
     public static ItemStack setName(ItemStack item, String text) {
-        Validate.notNull(item, "Item cannot be null!");
+        Validate.notNull(item, "item cannot be null!");
         ItemMeta itemMeta = item.getItemMeta();
 
         itemMeta.setDisplayName(StringUtils.getColoredText(text));
@@ -39,7 +39,7 @@ public class ItemUtils {
     }
 
     public static ItemStack setLore(ItemStack item, List<String> lore) {
-        Validate.notNull(item, "Item cannot be null!");
+        Validate.notNull(item, "item cannot be null!");
         Validate.notNull(item.getItemMeta(), "ItemMeta cannot be null!");
         ItemMeta itemMeta = item.getItemMeta();
 
@@ -85,7 +85,7 @@ public class ItemUtils {
     }
 
     public static ItemStack addFlags(ItemStack item, ItemFlag... flags) {
-        Validate.notNull(item, "Item cannot be null!");
+        Validate.notNull(item, "item cannot be null!");
         ItemMeta itemMeta = item.getItemMeta();
 
         itemMeta.addItemFlags(flags);
@@ -95,7 +95,7 @@ public class ItemUtils {
     }
 
     public static ItemStack setDamage(ItemStack item, int damage) {
-        Validate.notNull(item, "Item cannot be null!");
+        Validate.notNull(item, "item cannot be null!");
         ItemMeta itemMeta = item.getItemMeta();
         Damageable damageable = (Damageable) itemMeta;
         if (damageable == null) return item;
@@ -109,7 +109,7 @@ public class ItemUtils {
     // Persistent Data
 
     public static void setPersistentData(ItemStack item, String namespace, String key, PersistentDataType dataType, Object value) {
-        Validate.notNull(item, "Item cannot be null!");
+        Validate.notNull(item, "item cannot be null!");
         ItemMeta meta = item.getItemMeta();
 
         NamespacedKey k = new NamespacedKey(namespace, key);
@@ -119,7 +119,7 @@ public class ItemUtils {
     }
 
     public static Object getPersistentData(ItemStack item, String namespace, String key, PersistentDataType dataType) {
-        Validate.notNull(item, "Item cannot be null!");
+        Validate.notNull(item, "item cannot be null!");
         ItemMeta meta = item.getItemMeta();
 
         NamespacedKey k = new NamespacedKey(namespace, key);
@@ -146,7 +146,6 @@ public class ItemUtils {
     }
 
     // Base64
-
     public static int getItemSizeInBytes(ItemStack item) {
         String base64 = itemStackToBase64(item);
         byte[] decodedBytes = Base64.getDecoder().decode(base64);
@@ -181,7 +180,6 @@ public class ItemUtils {
     }
 
     // Skull
-
     public static ItemStack getHead(String base64) {
         ItemStack head = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta meta = (SkullMeta) head.getItemMeta();

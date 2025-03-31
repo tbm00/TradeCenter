@@ -30,6 +30,8 @@ public class PacketReader {
 
             @Override
             public void write(ChannelHandlerContext channelHandlerContext, Object packet, ChannelPromise promise) throws Exception {
+                // Listening for a chunk with light packet, so we can check what chunk what player
+                // is loading, and spawn trade center models for that player
                 if (packet instanceof ClientboundLevelChunkWithLightPacket lightPacket) {
                     new BukkitRunnable() {
                         @Override

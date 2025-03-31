@@ -17,6 +17,7 @@ import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -28,14 +29,15 @@ public class PlayerListener implements Listener {
         RecipesUtils.discoverRecipes(e.getPlayer());
 
         // Update trade center item
-        for (int slot = 0; slot < e.getPlayer().getInventory().getContents().length; slot++) {
-            ItemStack item = e.getPlayer().getInventory().getItem(slot);
+        Inventory playerInventory = e.getPlayer().getInventory();
+        for (int slot = 0; slot < playerInventory.getContents().length; slot++) {
+            ItemStack item = playerInventory.getItem(slot);
             if (ItemUtils.isNull(item)) continue;
             if (!TradeCenter.isTradeCenterItem(item)) continue;
 
             ItemStack updatedItem = TradeCenter.getTradeCenterItem();
             updatedItem.setAmount(item.getAmount());
-            e.getPlayer().getInventory().setItem(slot, updatedItem);
+            playerInventory.setItem(slot, updatedItem);
         }
     }
 
@@ -53,8 +55,8 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onTradeSelectEvent(TradeSelectEvent e) {
         Player player = (Player) e.getWhoClicked();
-        if (TradeCenter.getPlayerData(player) == null) return;  // Player did not selected trade in trade center menu
-        TradeCenter.getPlayerData(player).setSelectedTrade(e.getIndex());
+        if (TradeCenter.getPlayerData(player).isEmpty()) return;  // Player did not selected trade in trade center menu
+        TradeCenter.getPlayerData(player).orElseThrow().setSelectedTrade(e.getIndex());
     }
 
     @EventHandler

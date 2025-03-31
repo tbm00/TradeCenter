@@ -2,6 +2,7 @@ package me.spaff.tradecenter.cmd;
 
 import me.spaff.tradecenter.Constants;
 import me.spaff.tradecenter.Main;
+import me.spaff.tradecenter.TCColors;
 import me.spaff.tradecenter.config.Config;
 import me.spaff.tradecenter.tradecenter.TradeCenter;
 import me.spaff.tradecenter.utils.BukkitUtils;
@@ -15,15 +16,15 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 
 public class TCCommands implements CommandExecutor {
-    private final String prefix = StringUtils.getHexColor("#FDDC5C") + "[TradeCenter] ";
+    private final String prefix = TCColors.YELLOW + "[TradeCenter] ";
 
     private void sendHelp(Player player) {
         BukkitUtils.sendMessage(player, "");
-        BukkitUtils.sendMessage(player, StringUtils.getHexColor("#FDDC5C") + "                TradeCenter");
-        BukkitUtils.sendMessage(player, StringUtils.getHexColor("#fff2c2") + "- /tc give <player> - gives player a trade");
-        BukkitUtils.sendMessage(player, StringUtils.getHexColor("#fff2c2") + "center place item.");
-        BukkitUtils.sendMessage(player, StringUtils.getHexColor("#fff2c2") + "- /tc reload - reloads the config.");
-        BukkitUtils.sendMessage(player, StringUtils.getHexColor("#fff2c2") + "- /tc version - shows version of the plugin.");
+        BukkitUtils.sendMessage(player, TCColors.YELLOW + "                TradeCenter");
+        BukkitUtils.sendMessage(player, TCColors.BRIGHT_YELLOW + "- /tc give <player> - gives player a trade");
+        BukkitUtils.sendMessage(player, TCColors.BRIGHT_YELLOW  + "center place item.");
+        BukkitUtils.sendMessage(player, TCColors.BRIGHT_YELLOW  + "- /tc reload - reloads the config.");
+        BukkitUtils.sendMessage(player, TCColors.BRIGHT_YELLOW  + "- /tc version - shows version of the plugin.");
         BukkitUtils.sendMessage(player, "");
     }
 
@@ -49,7 +50,7 @@ public class TCCommands implements CommandExecutor {
         //---------------- Commands ----------------//
 
         if (args[0].equalsIgnoreCase("give")) {
-            if (args.length == 2) {
+            if (args.length < 3) {
                 Player otherPlayer = Bukkit.getPlayer(args[1]);
                 if (otherPlayer == null) {
                     sendPluginMessage(player, "&cInvalid player!");

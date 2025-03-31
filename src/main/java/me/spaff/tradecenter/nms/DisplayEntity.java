@@ -114,7 +114,6 @@ public class DisplayEntity {
 
         public GenericDisplay(Display displayEntity, Location location) {
             this.displayEntity = displayEntity;
-            //displayEntity.setBrightnessOverride(new Brightness(0, 0));
 
             this.location = location;
 

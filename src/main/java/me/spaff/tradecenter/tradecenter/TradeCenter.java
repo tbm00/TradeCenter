@@ -59,9 +59,7 @@ public class TradeCenter {
 
     public void onBreak() {
         // Close trade menu for player using it
-        Player player = beingUsedBy();
-        if (beingUsedBy() != null)
-            player.closeInventory();
+        beingUsedBy().ifPresent((player) -> player.closeInventory());
 
         // Clear model data
         clearModels();
@@ -77,8 +75,9 @@ public class TradeCenter {
         }
 
         // Clear previous player trade data
-        if (getPlayerData(player) != null)
-            getPlayerData(player).clearTradeData();
+        Optional<PlayerTradeCenterData> playerTradeData = getPlayerData(player);
+        playerTradeData.ifPresent(data -> data.clearTradeData());
+        playerTradeData.orElseGet(() -> new PlayerTradeCenterData(location));
 
         // Store trade index and a villager, so we can validate them and
         // get which villager selected trade is from.
@@ -148,11 +147,13 @@ public class TradeCenter {
         playerData.put(player.getUniqueId(), new PlayerTradeCenterData(location));
 
         // Set player trade data
-        getPlayerData(player).setTradeData(tradeData);
+        playerTradeData.ifPresent(playerData -> playerData.setTradeData(tradeData));
 
         // Set villagers' trading player to this player
-        getPlayerData(player).getTradeData().forEach((td) -> {
-            td.getVillager().setTradingPlayer(Packets.getCraftPlayer(player).getHandle());
+        playerTradeData.ifPresent(playerData -> {
+            playerData.getTradeData().forEach((td) -> {
+                td.villager().setTradingPlayer(Packets.getCraftPlayer(player).getHandle());
+            });
         });
 
         // Open trade menu with all the trades
@@ -179,7 +180,7 @@ public class TradeCenter {
         if (isShiftClick && !InventoryUtils.canFitItem(player, resultItem)) return;
 
         // Get selected trade from the menu
-        int selectedTradeIndex = TradeCenter.getPlayerData(player).getSelectedTrade();
+        int selectedTradeIndex = TradeCenter.getPlayerData(player).orElseThrow().getSelectedTrade(); // getSelectedTrade()
 
         // Get player's TRADED_WITH_VILLAGER statistic so we can later tell
         // how many times player traded something
@@ -187,12 +188,12 @@ public class TradeCenter {
 
         // Get trade center location so we can later drop
         // experience orbs after a trade
-        Location tradeCenterLoc = TradeCenter.getPlayerData(player).getTradeLocation();
+        Location tradeCenterLoc = TradeCenter.getPlayerData(player).orElseThrow().getTradeLocation();
 
         boolean breakOut = false;
         int tradesAmount = 0;
-        for (VillagerTradeData data : TradeCenter.getPlayerData(player).getTradeData()) {
-            Villager villager = data.getVillager();
+        for (VillagerTradeData data : TradeCenter.getPlayerData(player).orElseThrow().getTradeData()) {
+            Villager villager = data.villager();
 
             // Check if villager is valid
             Entity villagerEntity = Packets.getServerLevel(tradeCenterLoc.getWorld()).getEntity(villager.getId());
@@ -287,16 +288,19 @@ public class TradeCenter {
     }
 
     // Player Data
-    public static PlayerTradeCenterData getPlayerData(Player player) {
-        return playerData.get(player.getUniqueId());
+    public static Optional<PlayerTradeCenterData> getPlayerData(Player player) {
+        return Optional.ofNullable(playerData.get(player.getUniqueId()));
     }
 
     public static void clearPlayerData(Player player) {
-        if (getPlayerData(player) != null) {
-            getPlayerData(player).getTradeData().forEach((tradeData) -> {
-                tradeData.getVillager().setTradingPlayer(null);
+        Optional<PlayerTradeCenterData> playerTradeCenterData = getPlayerData(player);
+
+        playerTradeCenterData.ifPresent((playerData) -> {
+            playerData.getTradeData().forEach((data) -> {
+                data.villager().setTradingPlayer(null);
             });
-        }
+        });
+
         playerData.remove(player.getUniqueId());
     }
 
@@ -304,24 +308,19 @@ public class TradeCenter {
         return playerData.get(player.getUniqueId()).getTradeLocation();
     }
 
-    // TODO: Replace with below check
     public boolean isBeingUsed() {
-        for (var data : playerData.entrySet()) {
-            if (BukkitUtils.isSameLocation(location, data.getValue().getTradeLocation()))
-                return true;
-        }
-        return false;
+        return beingUsedBy().isPresent();
     }
 
-    public Player beingUsedBy() {
+    public Optional<Player> beingUsedBy() {
         for (var data : playerData.entrySet()) {
             Player player = Bukkit.getPlayer(data.getKey());
             if (player == null) continue;
 
             if (BukkitUtils.isSameLocation(location, data.getValue().getTradeLocation()))
-                return player;
+                return Optional.of(player);
         }
-        return null;
+        return Optional.empty();
     }
 
     // Model
@@ -366,12 +365,12 @@ public class TradeCenter {
         double offset = 0.2;
 
         double[][] offsets = {
-                {offset + 0.5, 0, offset + 0.5}, // {offset + 0.5, 0, offset + 0.5}
-                {offset + 0.49, 0, -offset + 0.01}, // {offset + 0.5, 0, -offset}
-                {-offset + 0.01, 0, offset + 0.49}, // {-offset, 0, offset + 0.5},
-                {-offset, 0, -offset}, // {-offset, 0, -offset}
-                {-offset, 1.19, -offset + 0.19}, // 0.19
-                {offset + 0.5, 1.19, -offset + 0.19}, // 0.19
+                {offset + 0.5, 0, offset + 0.5},
+                {offset + 0.49, 0, -offset + 0.01},
+                {-offset + 0.01, 0, offset + 0.49},
+                {-offset, 0, -offset},
+                {-offset, 1.19, -offset + 0.19},
+                {offset + 0.5, 1.19, -offset + 0.19},
                 {-offset + 0.31, 1.19, -offset},
                 {-offset + 0.31, 1.19, -offset + 0.895},
                 {-offset + 0.31, 0.951, -offset + 0.31},

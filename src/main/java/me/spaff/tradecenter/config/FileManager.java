@@ -48,15 +48,6 @@ public class FileManager {
         return configuration.get(path);
     }
 
-    public void reload() {
-        try {
-            configuration.load(file);
-        }
-        catch (IOException | InvalidConfigurationException e) {
-            e.printStackTrace();
-        }
-    }
-
     public void save() {
         try {
             configuration.save(file);
@@ -80,7 +71,6 @@ public class FileManager {
     }
 
     // Other
-
     public static String getMainDirectory() {
         return Main.getInstance().getDataFolder().getPath();
     }
