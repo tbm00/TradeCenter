@@ -46,7 +46,7 @@ public class PacketReader {
 
                             // world.getChunkAt(chunkX, chunkZ).getTileEntities()
                             for (int x = 0; x < 16; x++) {
-                                for (int y = 0; y < 319; y++) {
+                                for (int y = 0; y < 255; y++) {
                                     for (int z = 0; z < 16; z++) {
                                         if (chunkSnapshot.getBlockType(x, y, z) != Constants.TRADE_CENTER_BLOCK_TYPE) continue;
                                         ChunkData chunkData = new ChunkData(chunk.getBlock(x, y, z)); // Check if correct chunk block coords

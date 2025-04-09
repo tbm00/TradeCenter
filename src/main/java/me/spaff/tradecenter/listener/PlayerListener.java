@@ -6,6 +6,8 @@ import me.spaff.tradecenter.config.Config;
 import me.spaff.tradecenter.nms.PacketReader;
 import me.spaff.tradecenter.tradecenter.TradeCenter;
 import me.spaff.tradecenter.utils.*;
+
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -74,6 +76,10 @@ public class PlayerListener implements Listener {
         if (!ItemUtils.isNull(itemUsed) && TradeCenter.isTradeCenterItem(itemUsed)) {
             block.setType(Constants.TRADE_CENTER_BLOCK_TYPE);
             new TradeCenter(block.getLocation()).onPlace();
+
+            if (0>block.getLocation().getY()||block.getLocation().getY()>=256) {
+                e.getPlayer().sendMessage(ChatColor.RED + "Due to Bukkit limitations, you will have trouble seeing Trade Center blocks below y=0 and above y=255. Remember that the trade center block is brown stained glass!");
+            }
         }
     }
 
