@@ -14,6 +14,7 @@ import org.bukkit.craftbukkit.v1_21_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.List;
 import java.util.UUID;
 
 public class PacketReader {
@@ -33,36 +34,28 @@ public class PacketReader {
                 // Listening for a chunk with light packet, so we can check what chunk what player
                 // is loading, and spawn trade center models for that player
                 if (packet instanceof ClientboundLevelChunkWithLightPacket lightPacket) {
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            int chunkX = lightPacket.getX();
-                            int chunkZ = lightPacket.getZ();
-
-                            World world = player.getWorld();
-
-                            Chunk chunk = world.getChunkAt(chunkX, chunkZ);
-                            ChunkSnapshot chunkSnapshot = chunk.getChunkSnapshot(true, false , false);
-
-                            // world.getChunkAt(chunkX, chunkZ).getTileEntities()
-                            for (int x = 0; x < 16; x++) {
-                                for (int y = 0; y < 255; y++) {
-                                    for (int z = 0; z < 16; z++) {
-                                        if (chunkSnapshot.getBlockType(x, y, z) != Constants.TRADE_CENTER_BLOCK_TYPE) continue;
-                                        ChunkData chunkData = new ChunkData(chunk.getBlock(x, y, z)); // Check if correct chunk block coords
-                                        if (chunkData.getData() == null || !chunkData.getData().equals(Constants.TRADE_CENTER_DATA_ID)) continue;
-
-                                        TradeCenter tradeCenter = new TradeCenter(chunk.getBlock(x, y, z).getLocation());
-
-                                        tradeCenter.clearModels(player);
+                    // Construct a key from the chunk coordinates in the packet
+                    String chunkKey = lightPacket.getX() + "-" + lightPacket.getZ();
+                    List<Location> tradeCenterLocations = me.spaff.tradecenter.tradecenter.DisplayLocationCache.getDisplayLocationsByChunk(chunkKey);
+                    
+                    // If there is no registered trade center in this chunk, skip processing
+                    if (tradeCenterLocations != null && !tradeCenterLocations.isEmpty()) {
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                for (Location loc : tradeCenterLocations) {
+                                    if (TradeCenter.isTradeCenter(loc.getBlock())) {
+                                        TradeCenter tradeCenter = new TradeCenter(loc);
+                                        tradeCenter.clearModel(player);
                                         tradeCenter.spawnModel(player);
+                                    } else {
+                                        me.spaff.tradecenter.tradecenter.DisplayLocationCache.removeDisplayLocation(loc);
                                     }
                                 }
                             }
-                        }
-                    }.runTaskLater(Main.getInstance(), 5);
+                        }.runTaskLater(Main.getInstance(), 5);
+                    }
                 }
-
                 super.write(channelHandlerContext, packet, promise);
             }
         };

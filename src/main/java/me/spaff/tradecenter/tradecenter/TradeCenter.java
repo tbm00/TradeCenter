@@ -55,14 +55,20 @@ public class TradeCenter {
 
         // Save persistent data
         saveData();
+
+        // Add location to cache
+        me.spaff.tradecenter.tradecenter.DisplayLocationCache.addDisplayLocation(location);
     }
 
     public void onBreak() {
+        // Remove location from cache
+        me.spaff.tradecenter.tradecenter.DisplayLocationCache.removeDisplayLocation(location);
+
         // Close trade menu for player using it
         beingUsedBy().ifPresent((player) -> player.closeInventory());
 
         // Clear model data
-        clearModels();
+        clearModel();
 
         // Clear persistent data
         clearData();
@@ -344,14 +350,14 @@ public class TradeCenter {
         }
     }
 
-    public void clearModels() {
+    public void clearModel() {
         Bukkit.getOnlinePlayers().forEach((player) -> {
-            clearModels(player);
+            clearModel(player);
         });
         modelData.remove(location);
     }
 
-    public void clearModels(Player player) {
+    public void clearModel(Player player) {
         // Clear old model data for player so the models
         // don't pile up and eventually lag player's game
         if (modelData.get(location) == null) return;
