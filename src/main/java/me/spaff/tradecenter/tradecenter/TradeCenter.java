@@ -301,7 +301,7 @@ public class TradeCenter {
     }
 
     public static boolean isTradeCenter(Block block) {
-        return new ChunkData(block).getData() != null;
+        return Constants.TRADE_CENTER_DATA_ID.equals(new ChunkData(block).getData());
     }
 
     // Player Data
