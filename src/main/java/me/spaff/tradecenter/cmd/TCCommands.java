@@ -7,7 +7,6 @@ import me.spaff.tradecenter.config.Config;
 import me.spaff.tradecenter.tradecenter.DisplayLocationCache;
 import me.spaff.tradecenter.tradecenter.TradeCenter;
 import me.spaff.tradecenter.utils.BukkitUtils;
-import me.spaff.tradecenter.utils.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

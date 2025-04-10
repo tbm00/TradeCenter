@@ -15,7 +15,7 @@ import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class Main extends JavaPlugin {
-    public static final String version = "1.0.2";
+    public static final String version = "1.1.0";
     private static Main instance;
     private static DisplayLocationCache displayCache;
 
