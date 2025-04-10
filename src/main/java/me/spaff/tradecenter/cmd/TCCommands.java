@@ -4,6 +4,7 @@ import me.spaff.tradecenter.Constants;
 import me.spaff.tradecenter.Main;
 import me.spaff.tradecenter.TCColors;
 import me.spaff.tradecenter.config.Config;
+import me.spaff.tradecenter.tradecenter.DisplayLocationCache;
 import me.spaff.tradecenter.tradecenter.TradeCenter;
 import me.spaff.tradecenter.utils.BukkitUtils;
 import me.spaff.tradecenter.utils.StringUtils;
@@ -17,6 +18,11 @@ import java.util.HashMap;
 
 public class TCCommands implements CommandExecutor {
     private final String prefix = TCColors.YELLOW + "[TradeCenter] ";
+    private DisplayLocationCache displayCache;
+
+    public TCCommands(DisplayLocationCache displayCache) {
+        this.displayCache = displayCache;
+    }
 
     private void sendHelp(Player player) {
         BukkitUtils.sendMessage(player, "");
@@ -24,7 +30,8 @@ public class TCCommands implements CommandExecutor {
         BukkitUtils.sendMessage(player, TCColors.BRIGHT_YELLOW + "- /tc give <player> - gives player a trade");
         BukkitUtils.sendMessage(player, TCColors.BRIGHT_YELLOW  + "center place item.");
         BukkitUtils.sendMessage(player, TCColors.BRIGHT_YELLOW  + "- /tc reload - reloads the config.");
-        BukkitUtils.sendMessage(player, TCColors.BRIGHT_YELLOW  + "- /tc version - shows version of the plugin.");
+        BukkitUtils.sendMessage(player, TCColors.BRIGHT_YELLOW  + "- /tc buildcache - adds loaded trade center block locations to cache.");
+        BukkitUtils.sendMessage(player, TCColors.BRIGHT_YELLOW  + "- /tc clearcache - clears the cache.");
         BukkitUtils.sendMessage(player, "");
     }
 
@@ -77,6 +84,14 @@ public class TCCommands implements CommandExecutor {
         }
         else if (args[0].equalsIgnoreCase("version")) {
             sendPluginMessage(player, "&7Version: &fv" + Main.version);
+        }
+        else if (args[0].equalsIgnoreCase("buildcache")) {
+            sendPluginMessage(player, "&7Building DisplayLocactionCache..!" );
+            displayCache.buildCache();
+        }
+        else if (args[0].equalsIgnoreCase("clearcache")) {
+            sendPluginMessage(player, "&7Clearing DisplayLocactionCache..!" );
+            displayCache.clearCache();
         }
         else
             sendHelp(player);

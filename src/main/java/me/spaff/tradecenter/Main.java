@@ -60,7 +60,7 @@ public final class Main extends JavaPlugin {
     }
 
     private void registerCommands() {
-        this.getCommand("tradecenter").setExecutor(new TCCommands());
+        this.getCommand("tradecenter").setExecutor(new TCCommands(displayCache));
     }
 
     private void registerRecipes() {

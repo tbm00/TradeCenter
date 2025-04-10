@@ -11,7 +11,7 @@ public class Constants {
     // Trade Center
     public static final String TRADE_CENTER_DATA_ID = "TradeCenter";
 
-    public static final Material TRADE_CENTER_BLOCK_TYPE = Material.BROWN_STAINED_GLASS;
+    public static final Material TRADE_CENTER_BLOCK_TYPE = Material.GLASS;
 
     public static final String TRADE_CENTER_NAMESPACE_KEY = "itemid";
     public static final String TRADE_CENTER_ITEM_ID = "tradecenter";

@@ -2,6 +2,9 @@ package me.spaff.tradecenter.tradecenter;
 
 import me.spaff.tradecenter.config.Config;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
@@ -9,9 +12,11 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.Location;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -72,14 +77,52 @@ public class DisplayLocationCache {
         for (int x = 0; x < 16; x++) {
             for (int y = world.getMinHeight(); y < world.getMaxHeight(); y++) {
                 for (int z = 0; z < 16; z++) {
+                    if (!chunk.isLoaded()) return;
                     Block block = chunk.getBlock(x, y, z);
                     if (TradeCenter.isTradeCenter(block)) {
                         addDisplayLocation(block.getLocation());
-                        plugin.getLogger().info("Display @ " + chunk.getWorld().getName() + ": " + x + ", " + y + ", " + z);
+                        plugin.getLogger().info("Display @ " + chunk.getWorld().getName() + ": " + block.getX() + ", " + block.getY() + ", " + block.getZ());
                     }
                 }
             }
         }
+    }
+
+    public void buildCache() {
+        List<Pair<World, Chunk>> chunksToScan = new ArrayList<>();
+        for (World world : Bukkit.getWorlds()) {
+            for (Chunk chunk : world.getLoadedChunks()) {
+                chunksToScan.add(ImmutablePair.of(world, chunk));
+            }
+        }
+        
+        final int totalChunks = chunksToScan.size();
+        final int batchSize = 4;
+        final long batchDelay = 2;
+
+        plugin.getLogger().warning("Starting building DisplayLocactionCache for " + totalChunks + " chunks!");
+
+        Iterator<Pair<World, Chunk>> iterator = chunksToScan.iterator();
+        new BukkitRunnable() {
+            int ticksElapsed = 0;
+            
+            @Override
+            public void run() {
+                int count = 0;
+                while (iterator.hasNext() && count < batchSize) {
+                    Pair<World, Chunk> pair = iterator.next();
+                    scanChunkForTradeCenters(pair.getLeft(), pair.getRight());
+                    count++;
+                }
+                
+                ticksElapsed++;
+                
+                if (!iterator.hasNext()) {
+                    plugin.getLogger().warning("Finished building DisplayLocactionCache in ~" + ticksElapsed + " ticks!");
+                    cancel();
+                }
+            }
+        }.runTaskTimer(plugin, 0L, batchDelay);
     }
 
     public void clearCache() {
