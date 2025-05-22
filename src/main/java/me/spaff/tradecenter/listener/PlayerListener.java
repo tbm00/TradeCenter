@@ -3,7 +3,6 @@ package me.spaff.tradecenter.listener;
 import me.spaff.tradecenter.Constants;
 import me.spaff.tradecenter.Main;
 import me.spaff.tradecenter.config.Config;
-import me.spaff.tradecenter.nms.PacketReader;
 import me.spaff.tradecenter.tradecenter.TradeCenter;
 import me.spaff.tradecenter.utils.*;
 
@@ -25,7 +24,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class PlayerListener implements Listener {
     @EventHandler
     public void onPlayerJoinEvent(PlayerJoinEvent e) {
-        PacketReader.injectPlayer(e.getPlayer());
         TradeCenter.clearPlayerData(e.getPlayer());
         RecipesUtils.discoverRecipes(e.getPlayer());
 
@@ -44,7 +42,6 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onPlayerQuitEvent(PlayerQuitEvent e) {
-        PacketReader.uninjectPlayer(e.getPlayer());
         TradeCenter.clearPlayerData(e.getPlayer());
     }
 

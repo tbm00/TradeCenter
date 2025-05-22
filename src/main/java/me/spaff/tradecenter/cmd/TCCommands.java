@@ -4,7 +4,6 @@ import me.spaff.tradecenter.Constants;
 import me.spaff.tradecenter.Main;
 import me.spaff.tradecenter.TCColors;
 import me.spaff.tradecenter.config.Config;
-import me.spaff.tradecenter.tradecenter.DisplayLocationCache;
 import me.spaff.tradecenter.tradecenter.TradeCenter;
 import me.spaff.tradecenter.utils.BukkitUtils;
 import org.bukkit.Bukkit;
@@ -18,11 +17,6 @@ import java.util.HashMap;
 
 public class TCCommands implements CommandExecutor {
     private final String prefix = TCColors.YELLOW + "[TradeCenter] ";
-    private DisplayLocationCache displayCache;
-
-    public TCCommands(DisplayLocationCache displayCache) {
-        this.displayCache = displayCache;
-    }
 
     private void sendHelp(CommandSender sender) {
         BukkitUtils.sendMessage(sender, "");
@@ -84,14 +78,6 @@ public class TCCommands implements CommandExecutor {
         }
         else if (args[0].equalsIgnoreCase("version")) {
             sendPluginMessage(sender, "&7Version: &fv" + Main.version);
-        }
-        else if (args[0].equalsIgnoreCase("buildcache")) {
-            sendPluginMessage(sender, "&7Building DisplayLocactionCache..!" );
-            displayCache.buildCache();
-        }
-        else if (args[0].equalsIgnoreCase("clearcache")) {
-            sendPluginMessage(sender, "&7Clearing DisplayLocactionCache..!" );
-            displayCache.clearCache();
         }
         else
             sendHelp(sender);
