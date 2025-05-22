@@ -4,7 +4,6 @@ import me.spaff.tradecenter.Constants;
 import me.spaff.tradecenter.Main;
 import me.spaff.tradecenter.chunkdata.ChunkData;
 import me.spaff.tradecenter.config.Config;
-import me.spaff.tradecenter.nms.DisplayEntity;
 import me.spaff.tradecenter.nms.Packets;
 import me.spaff.tradecenter.utils.BukkitUtils;
 import me.spaff.tradecenter.utils.InventoryUtils;
@@ -16,10 +15,8 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.VillagerData;
 import net.minecraft.world.item.trading.MerchantOffer;
-import net.minecraft.world.level.block.Blocks;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Statistic;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_21_R3.inventory.CraftItemStack;
@@ -35,14 +32,11 @@ import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
 
 import java.util.*;
 
 public class TradeCenter {
     private final Location location;
-    private static Map<Location, List<DisplayEntity>> modelData = new HashMap<>();
     private static Map<UUID, PlayerTradeCenterData> playerData = new HashMap<>();
 
     public TradeCenter(Location location) {
@@ -50,25 +44,13 @@ public class TradeCenter {
     }
 
     public void onPlace() {
-        // Spawn models
-        spawnModel();
-
         // Save persistent data
         saveData();
-
-        // Add location to cache
-        me.spaff.tradecenter.tradecenter.DisplayLocationCache.addDisplayLocation(location);
     }
 
     public void onBreak() {
-        // Remove location from cache
-        me.spaff.tradecenter.tradecenter.DisplayLocationCache.removeDisplayLocation(location);
-
         // Close trade menu for player using it
         beingUsedBy().ifPresent((player) -> player.closeInventory());
-
-        // Clear model data
-        clearModel();
 
         // Clear persistent data
         clearData();
@@ -338,178 +320,6 @@ public class TradeCenter {
                 return Optional.of(player);
         }
         return Optional.empty();
-    }
-
-    // Model
-    public static void clearModelData() {
-        for (var data : modelData.entrySet()) {
-            List<DisplayEntity> models = data.getValue();
-            models.forEach(model -> {
-                model.remove();
-            });
-        }
-    }
-
-    public void clearModel() {
-        Bukkit.getOnlinePlayers().forEach((player) -> {
-            clearModel(player);
-        });
-        modelData.remove(location);
-    }
-
-    public void clearModel(Player player) {
-        // Clear old model data for player so the models
-        // don't pile up and eventually lag player's game
-        if (modelData.get(location) == null) return;
-
-        List<DisplayEntity> models = modelData.get(location);
-        models.forEach((model) -> {
-            model.remove(player);
-        });
-    }
-
-    public void spawnModel() {
-        Bukkit.getOnlinePlayers().forEach((player) -> {
-            spawnModel(player);
-        });
-    }
-
-    public void spawnModel(Player player) {
-        Location loc = location.clone().getBlock().getLocation();
-        loc.setYaw(0);
-        loc.setPitch(0);
-
-        double offset = 0.2;
-
-        double[][] offsets = {
-                {offset + 0.5, 0, offset + 0.5},
-                {offset + 0.49, 0, -offset + 0.01},
-                {-offset + 0.01, 0, offset + 0.49},
-                {-offset, 0, -offset},
-                {-offset, 1.19, -offset + 0.19},
-                {offset + 0.5, 1.19, -offset + 0.19},
-                {-offset + 0.31, 1.19, -offset},
-                {-offset + 0.31, 1.19, -offset + 0.895},
-                {-offset + 0.31, 0.951, -offset + 0.31},
-                {-offset + 0.5, 1.02, -offset + 0.9},
-                {-offset + 0.75, 1.02, -offset + 0.5},
-                {-offset + 0.3, 1.02, -offset + 0.65},
-        };
-
-        Vector3f[] scales = {
-                new Vector3f(0.5f, 0.88f, 0.5f),
-                new Vector3f(0.5f, 0.88f, 0.5f),
-                new Vector3f(0.5f, 0.88f, 0.5f),
-                new Vector3f(0.5f, 0.88f, 0.5f),
-                new Vector3f(0.5f, 0.5f, 1.02f),
-                new Vector3f(0.5f, 0.5f, 1.02f),
-                new Vector3f(0.78f, 0.5f, 0.5f),
-                new Vector3f(0.78f, 0.5f, 0.5f),
-                new Vector3f(0.8f, 0.8f, 0.8f),
-                new Vector3f(0.4f, 0.4f, 0.4f),
-                new Vector3f(0.4f, 0.4f, 0.4f),
-                new Vector3f(1f, 1f, 1f)
-        };
-
-        Quaternionf[] rightRotations = {
-                new Quaternionf(),
-                new Quaternionf(),
-                new Quaternionf(),
-                new Quaternionf(),
-                new Quaternionf(0.7f, 0f, 0f, 0.7f),
-                new Quaternionf(0.7f, 0f, 0f, 0.7f),
-                new Quaternionf(0, 0f, -0.7f, 0.7f),
-                new Quaternionf(0, 0f, -0.7f, 0.7f),
-                new Quaternionf(),
-                new Quaternionf(0, 0f, -0.85f, 0.7f),
-                new Quaternionf(0, 0f, -0.6f, 0.7f),
-                new Quaternionf(0, 0.2f, 0f, 1f)
-        };
-
-        Quaternionf[] leftRotations = {
-                new Quaternionf(),
-                new Quaternionf(),
-                new Quaternionf(),
-                new Quaternionf(),
-                new Quaternionf(),
-                new Quaternionf(),
-                new Quaternionf(),
-                new Quaternionf(),
-                new Quaternionf(),
-                new Quaternionf(0.7f, 0.f, 0.f, 0.7f),
-                new Quaternionf(0.7f, 0.f, 0.f, 0.7f),
-                new Quaternionf(),
-        };
-
-        net.minecraft.world.level.block.Block[] displayedBlocks = {
-                Blocks.DARK_OAK_FENCE,
-                Blocks.DARK_OAK_FENCE,
-                Blocks.DARK_OAK_FENCE,
-                Blocks.DARK_OAK_FENCE,
-                Blocks.DARK_OAK_FENCE,
-                Blocks.DARK_OAK_FENCE,
-                Blocks.DARK_OAK_FENCE,
-                Blocks.DARK_OAK_FENCE,
-                Blocks.RED_CARPET,
-                null,
-                null,
-                Blocks.CANDLE
-        };
-
-        ItemStack[] displayedItems = {
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                new ItemStack(Material.EMERALD),
-                new ItemStack(Material.WRITABLE_BOOK),
-                null,
-        };
-
-        if (modelData.get(location) != null) {
-            List<DisplayEntity> models = modelData.get(location);
-            models.forEach((model) -> {
-                model.show(player);
-            });
-            return;
-        }
-
-        List<DisplayEntity> models = new ArrayList<>();
-        for (int i = 0; i < offsets.length; i++) {
-            double[] offst = offsets[i];
-            Vector3f scale = scales[i];
-            Quaternionf leftRotation = leftRotations[i];
-            Quaternionf rightRotation = rightRotations[i];
-            net.minecraft.world.level.block.Block displayedBlock = displayedBlocks[i];
-            ItemStack displayedItem = displayedItems[i];
-
-            DisplayEntity displayEntity = null;
-            if (displayedItem == null) {
-                displayEntity = new DisplayEntity.BlockDisplay(loc.clone().add(offst[0], offst[1], offst[2]))
-                        .leftRotation(leftRotation)
-                        .rightRotation(rightRotation)
-                        .scale(scale)
-                        .displayedBlock(displayedBlock)
-                        .show(player);
-            }
-            else if (displayedBlock == null) {
-                displayEntity = new DisplayEntity.ItemDisplay(loc.clone().add(offst[0], offst[1], offst[2]))
-                        .leftRotation(leftRotation)
-                        .rightRotation(rightRotation)
-                        .scale(scale)
-                        .displayedItem(displayedItem)
-                        .show(player);
-            }
-
-            models.add(displayEntity);
-        }
-
-        modelData.put(location, models);
     }
 
     public static boolean isTradeCenterItem(ItemStack item) {
